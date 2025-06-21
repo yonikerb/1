@@ -10,80 +10,7 @@
       background: linear-gradient(to bottom, #e0f7fa, #ffffff);
       direction: rtl;
     }
-
-    h1 {
-      text-align: center;
-      color: #006064;
-      padding: 30px 0;
-      font-size: 2.8em;
-    }
-
-    #courses {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 30px;
-      padding: 20px;
-    }
-
-    .banner {
-      width: 340px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      overflow: hidden;
-      transition: transform 0.4s, box-shadow 0.4s;
-    }
-
-    .banner:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.3);
-    }
-
-    .banner img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .banner-content {
-      padding: 20px;
-    }
-
-    .banner-content h2 {
-      color: #00796b;
-      margin-top: 0;
-      font-size: 1.4em;
-    }
-
-    .banner-content p {
-      margin: 6px 0;
-      color: #444;
-      font-size: 0.95em;
-    }
-
-    .register-btn {
-      margin-top: 12px;
-      display: block;
-      text-align: center;
-      background-color: #00acc1;
-      color: white;
-      padding: 10px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-
-    .register-btn:hover {
-      background-color: #00838f;
-    }
-
-    @media (max-width: 600px) {
-      .banner {
-        width: 90%;
-      }
-    }
+    /* ... CSS כמו קודם ... */
   </style>
 </head>
 <body>
@@ -96,47 +23,90 @@
     fetch(SHEET_URL)
       .then(res => res.json())
       .then(data => {
+        console.log("DATA FROM API:", data); // הדפסת הנתונים לקונסול
         const container = document.getElementById('courses');
+
         if (!data || data.length === 0) {
           container.innerHTML = "<p style='text-align:center;'>אין כרגע קורסים זמינים.</p>";
           return;
         }
 
-        data.forEach(row => {
-          // row הוא מערך: row[0] = חותמת זמן, row[1] = תאריך התחלה וכו'
+        // אם data הוא מערך של אובייקטים
+        if(typeof data[0] === "object" && !Array.isArray(data[0])) {
+          data.forEach(course => {
+            console.log("Course object:", course);
+            // כאן השתמש בשמות העמודות לפי שדות האובייקט
+            const banner = document.createElement('div');
+            banner.className = 'banner';
 
-          const banner = document.createElement('div');
-          banner.className = 'banner';
+            const imgSrc = extractDriveImage(course["העלאת תמונה"]);
 
-          const imgSrc = extractDriveImage(row[9]);
+            const startDate = formatDate(course["תאריך התחלה"]);
+            const endDate = formatDate(course["תאריך סיום הקורס"]);
+            const days = course["ימי מפגשים"] || '';
+            const hours = course["שעות"] || '';
+            const price = course["מחיר"] || '';
+            const audience = course["קהל יעד"] || '';
+            const notes = course["הערות"] || '';
+            const level = course["הכשרה"] || '';
+            const location = course["מיקום"] || '';
 
-          const startDate = formatDate(row[1]);
-          const endDate = formatDate(row[2]);
-          const days = row[3] || '';
-          const hours = row[4] || '';
-          const price = row[5] || '';
-          const audience = row[6] || '';
-          const notes = row[7] || '';
-          const level = row[8] || '';
-          const location = row[10] || '';
+            banner.innerHTML = `
+              <img src="${imgSrc}" alt="תמונה" />
+              <div class="banner-content">
+                <h2>${level}</h2>
+                <p><strong>תאריך התחלה:</strong> ${startDate}</p>
+                <p><strong>תאריך סיום:</strong> ${endDate}</p>
+                <p><strong>ימי מפגשים:</strong> ${days}</p>
+                <p><strong>שעות:</strong> ${hours}</p>
+                <p><strong>מחיר:</strong> ${price} ש"ח</p>
+                <p><strong>קהל יעד:</strong> ${audience}</p>
+                <p><strong>הערות:</strong> ${notes}</p>
+                <p><strong>מיקום:</strong> ${location}</p>
+                <a href="#" class="register-btn">להרשמה</a>
+              </div>
+            `;
+            container.appendChild(banner);
+          });
+        }
+        // אם data הוא מערך של מערכים
+        else if(Array.isArray(data[0])) {
+          data.forEach(row => {
+            console.log("Course array row:", row);
+            const banner = document.createElement('div');
+            banner.className = 'banner';
 
-          banner.innerHTML = `
-            <img src="${imgSrc}" alt="תמונה" />
-            <div class="banner-content">
-              <h2>${level}</h2>
-              <p><strong>תאריך התחלה:</strong> ${startDate}</p>
-              <p><strong>תאריך סיום:</strong> ${endDate}</p>
-              <p><strong>ימי מפגשים:</strong> ${days}</p>
-              <p><strong>שעות:</strong> ${hours}</p>
-              <p><strong>מחיר:</strong> ${price} ש"ח</p>
-              <p><strong>קהל יעד:</strong> ${audience}</p>
-              <p><strong>הערות:</strong> ${notes}</p>
-              <p><strong>מיקום:</strong> ${location}</p>
-              <a href="#" class="register-btn">להרשמה</a>
-            </div>
-          `;
-          container.appendChild(banner);
-        });
+            const imgSrc = extractDriveImage(row[9]);
+            const startDate = formatDate(row[1]);
+            const endDate = formatDate(row[2]);
+            const days = row[3] || '';
+            const hours = row[4] || '';
+            const price = row[5] || '';
+            const audience = row[6] || '';
+            const notes = row[7] || '';
+            const level = row[8] || '';
+            const location = row[10] || '';
+
+            banner.innerHTML = `
+              <img src="${imgSrc}" alt="תמונה" />
+              <div class="banner-content">
+                <h2>${level}</h2>
+                <p><strong>תאריך התחלה:</strong> ${startDate}</p>
+                <p><strong>תאריך סיום:</strong> ${endDate}</p>
+                <p><strong>ימי מפגשים:</strong> ${days}</p>
+                <p><strong>שעות:</strong> ${hours}</p>
+                <p><strong>מחיר:</strong> ${price} ש"ח</p>
+                <p><strong>קהל יעד:</strong> ${audience}</p>
+                <p><strong>הערות:</strong> ${notes}</p>
+                <p><strong>מיקום:</strong> ${location}</p>
+                <a href="#" class="register-btn">להרשמה</a>
+              </div>
+            `;
+            container.appendChild(banner);
+          });
+        } else {
+          container.innerHTML = "<p style='text-align:center;'>מבנה הנתונים לא נתמך.</p>";
+        }
       })
       .catch(err => {
         console.error(err);
@@ -154,12 +124,10 @@
 
     function formatDate(dateStr) {
       if (!dateStr) return '';
-      // ניסיון להמיר תאריך למשתנה Date
       const date = new Date(dateStr);
       if (!isNaN(date)) {
         return date.toLocaleDateString('he-IL');
       }
-      // אם התאריך הוא בפורמט dd/mm/yyyy
       const parts = dateStr.split('/');
       if (parts.length === 3) {
         return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;

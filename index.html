@@ -102,26 +102,23 @@
           return;
         }
 
-        data.forEach(course => {
-          console.log(course); // כדי לבדוק מבנה הנתונים בקונסול
+        data.forEach(row => {
+          // row הוא מערך: row[0] = חותמת זמן, row[1] = תאריך התחלה וכו'
 
           const banner = document.createElement('div');
           banner.className = 'banner';
 
-          const imgSrc = extractDriveImage(course["העלאת תמונה"] || course["J"] || course[9]);
+          const imgSrc = extractDriveImage(row[9]);
 
-          const startDateRaw = course["תאריך התחלה"] || course["B"] || course[1] || '';
-          const endDateRaw = course["תאריך סיום הקורס"] || course["C"] || course[2] || '';
-
-          const startDate = formatDate(startDateRaw);
-          const endDate = formatDate(endDateRaw);
-
-          const days = course["ימי מפגשים"] || course["D"] || course[3] || '';
-          const hours = course["שעות"] || course["E"] || course[4] || '';
-          const price = course["מחיר"] || course["F"] || course[5] || '';
-          const audience = course["קהל יעד"] || course["G"] || course[6] || '';
-          const notes = course["הערות"] || course["H"] || course[7] || '';
-          const level = course["הכשרה"] || course["I"] || course[8] || '';
+          const startDate = formatDate(row[1]);
+          const endDate = formatDate(row[2]);
+          const days = row[3] || '';
+          const hours = row[4] || '';
+          const price = row[5] || '';
+          const audience = row[6] || '';
+          const notes = row[7] || '';
+          const level = row[8] || '';
+          const location = row[10] || '';
 
           banner.innerHTML = `
             <img src="${imgSrc}" alt="תמונה" />
@@ -134,6 +131,7 @@
               <p><strong>מחיר:</strong> ${price} ש"ח</p>
               <p><strong>קהל יעד:</strong> ${audience}</p>
               <p><strong>הערות:</strong> ${notes}</p>
+              <p><strong>מיקום:</strong> ${location}</p>
               <a href="#" class="register-btn">להרשמה</a>
             </div>
           `;
@@ -156,10 +154,12 @@
 
     function formatDate(dateStr) {
       if (!dateStr) return '';
+      // ניסיון להמיר תאריך למשתנה Date
       const date = new Date(dateStr);
       if (!isNaN(date)) {
         return date.toLocaleDateString('he-IL');
       }
+      // אם התאריך הוא בפורמט dd/mm/yyyy
       const parts = dateStr.split('/');
       if (parts.length === 3) {
         return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8">
+  <title>קורסים קרובים - יוז'וק מדיק</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      direction: rtl;
+      background: linear-gradient(to bottom, #e3f2fd, #ffffff);
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 30px;
+      color: #0d47a1;
+      font-size: 2.5em;
+      animation: fadeInDown 1s ease-in-out;
+    }
+
+    #courses {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 20px;
+    }
+
+    .banner {
+      width: 320px;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      overflow: hidden;
+      transition: transform 0.4s;
+      animation: fadeInUp 1s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .banner:hover {
+      transform: scale(1.03);
+    }
+
+    .banner img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .banner-content {
+      padding: 20px;
+    }
+
+    .banner-content h2 {
+      margin-top: 0;
+      color: #1565c0;
+      font-size: 1.4em;
+    }
+
+    .banner-content p {
+      margin: 5px 0;
+      color: #333;
+    }
+
+    .register-btn {
+      margin-top: 15px;
+      display: block;
+      text-align: center;
+      background-color: #2196f3;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .register-btn:hover {
+      background-color: #0d47a1;
+    }
+
+    @keyframes fadeInDown {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @media (max-width: 600px) {
+      .banner {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 קורסים קרובים ביוז'וק מדיק</h1>
+  <div id="courses"></div>
+
+  <script>
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbwyFvOHgqTmAKoTMPvifghv18QUNqIGYpkGqNXH-9aYjoEC2kO_8aybb8ii6Q3aCn2GFA/exec";
+
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('courses');
+        if (data.length === 0) {
+          container.innerHTML = "<p style='text-align:center;'>אין כרגע קורסים זמינים.</p>";
+          return;
+        }
+
+        data.forEach(course => {
+          const banner = document.createElement('div');
+          banner.className = 'banner';
+
+          const imageSrc = extractDriveImage(course["העלאת תמונה"]);
+
+          banner.innerHTML = `
+            <img src="${imageSrc}" alt="תמונה">
+            <div class="banner-content">
+              <h2>${course["הכשרה"]}</h2>
+              <p><strong>תאריכים:</strong> ${course["תאריך התחלה"]} - ${course["תאריך סיום הקורס"]}</p>
+              <p><strong>שעות:</strong> ${course["שעות"]}</p>
+              <p><strong>ימי מפגשים:</strong> ${course["ימי מפגשים"]}</p>
+              <p><strong>מחיר:</strong> ${course["מחיר"]}</p>
+              <p><strong>קהל יעד:</strong> ${course["קהל יעד"]}</p>
+              <p><strong>הערות:</strong> ${course["הערות"]}</p>
+              <a class="register-btn" href="#">להרשמה</a>
+            </div>
+          `;
+          container.appendChild(banner);
+        });
+      });
+
+    function extractDriveImage(link) {
+      const match = link.match(/\/d\/([^\/]+)\//);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+      return "https://via.placeholder.com/320x180.png?text=אין+תמונה";
+    }
+  </script>
+</body>
+</html>

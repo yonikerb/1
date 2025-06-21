@@ -5,18 +5,26 @@
   <title>קורסים קרובים - יוז'וק מדיק</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      direction: rtl;
-      background: linear-gradient(to bottom, #e3f2fd, #ffffff);
       margin: 0;
       padding: 0;
+      direction: rtl;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1580281657527-47a0f6f1cfa2?fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      backdrop-filter: blur(4px);
+    }
+
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.9);
+      min-height: 100vh;
+      padding: 40px 20px;
     }
 
     h1 {
       text-align: center;
-      padding: 30px;
       color: #0d47a1;
-      font-size: 2.5em;
+      font-size: 3em;
+      margin-bottom: 40px;
       animation: fadeInDown 1s ease-in-out;
     }
 
@@ -25,14 +33,13 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 30px;
-      padding: 20px;
     }
 
     .banner {
-      width: 320px;
-      background-color: white;
+      width: 340px;
+      background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       overflow: hidden;
       transition: transform 0.4s;
       animation: fadeInUp 1s ease;
@@ -46,7 +53,7 @@
 
     .banner img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
     }
 
@@ -55,9 +62,9 @@
     }
 
     .banner-content h2 {
-      margin-top: 0;
+      margin: 0;
       color: #1565c0;
-      font-size: 1.4em;
+      font-size: 1.5em;
     }
 
     .banner-content p {
@@ -71,7 +78,7 @@
       text-align: center;
       background-color: #2196f3;
       color: white;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
       font-weight: bold;
       text-decoration: none;
@@ -100,51 +107,55 @@
   </style>
 </head>
 <body>
-  <h1>📅 קורסים קרובים ביוז'וק מדיק</h1>
+<div class="overlay">
+  <h1>קורסים קרובים ביוז'וק מדיק</h1>
   <div id="courses"></div>
+</div>
 
-  <script>
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbwyFvOHgqTmAKoTMPvifghv18QUNqIGYpkGqNXH-9aYjoEC2kO_8aybb8ii6Q3aCn2GFA/exec";
+<script>
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwyFvOHgqTmAKoTMPvifghv18QUNqIGYpkGqNXH-9aYjoEC2kO_8aybb8ii6Q3aCn2GFA/exec";
 
-    fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById('courses');
-        if (data.length === 0) {
-          container.innerHTML = "<p style='text-align:center;'>אין כרגע קורסים זמינים.</p>";
-          return;
-        }
-
-        data.forEach(course => {
-          const banner = document.createElement('div');
-          banner.className = 'banner';
-
-          const imageSrc = extractDriveImage(course["העלאת תמונה"]);
-
-          banner.innerHTML = `
-            <img src="${imageSrc}" alt="תמונה">
-            <div class="banner-content">
-              <h2>${course["הכשרה"]}</h2>
-              <p><strong>תאריכים:</strong> ${course["תאריך התחלה"]} - ${course["תאריך סיום הקורס"]}</p>
-              <p><strong>שעות:</strong> ${course["שעות"]}</p>
-              <p><strong>ימי מפגשים:</strong> ${course["ימי מפגשים"]}</p>
-              <p><strong>מחיר:</strong> ${course["מחיר"]}</p>
-              <p><strong>קהל יעד:</strong> ${course["קהל יעד"]}</p>
-              <p><strong>הערות:</strong> ${course["הערות"]}</p>
-              <a class="register-btn" href="#">להרשמה</a>
-            </div>
-          `;
-          container.appendChild(banner);
-        });
-      });
-
-    function extractDriveImage(link) {
-      const match = link.match(/\/d\/([^\/]+)\//);
-      if (match && match[1]) {
-        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+  fetch(SHEET_URL)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('courses');
+      if (!data || !data.length) {
+        container.innerHTML = "<p style='text-align:center;'>אין כרגע קורסים זמינים.</p>";
+        return;
       }
-      return "https://via.placeholder.com/320x180.png?text=אין+תמונה";
+
+      data.forEach(course => {
+        const banner = document.createElement('div');
+        banner.className = 'banner';
+        const imageSrc = extractDriveImage(course["העלאת תמונה"]);
+
+        banner.innerHTML = `
+          <img src="${imageSrc}" alt="תמונה">
+          <div class="banner-content">
+            <h2>${course["הכשרה"]}</h2>
+            <p><strong>תאריכים:</strong> ${course["תאריך התחלה"]} - ${course["תאריך סיום הקורס"]}</p>
+            <p><strong>שעות:</strong> ${course["שעות"]}</p>
+            <p><strong>ימי מפגשים:</strong> ${course["ימי מפגשים"]}</p>
+            <p><strong>מחיר:</strong> ${course["מחיר"]}</p>
+            <p><strong>קהל יעד:</strong> ${course["קהל יעד"]}</p>
+            <p><strong>הערות:</strong> ${course["הערות"]}</p>
+            <a class="register-btn" href="#">להרשמה</a>
+          </div>
+        `;
+        container.appendChild(banner);
+      });
+    })
+    .catch(err => {
+      document.getElementById('courses').innerHTML = "<p style='text-align:center;'>שגיאה בטעינת הקורסים.</p>";
+    });
+
+  function extractDriveImage(link) {
+    const match = link.match(/\/d\/([^\/]+)\//);
+    if (match && match[1]) {
+      return `https://drive.google.com/uc?export=view&id=${match[1]}`;
     }
-  </script>
+    return "https://via.placeholder.com/320x200.png?text=אין+תמונה";
+  }
+</script>
 </body>
 </html>

@@ -1,254 +1,131 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8" />
-  <title>קורסי עזרה ראשונה קרובים - יוז'וק מדיק</title>
+  <meta charset="UTF-8">
+  <title>קורסים קרובים</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Assistant&display=swap');
-
     body {
       margin: 0;
-      font-family: 'Assistant', sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #f0f4f8;
+      padding: 0;
+      font-family: "Segoe UI", "Open Sans", Arial, sans-serif;
+      background-color: #f0f8ff;
       direction: rtl;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
+      color: #1c3b6b;
     }
 
-    h1 {
-      font-weight: 800;
-      font-size: 3rem;
-      margin-bottom: 40px;
-      letter-spacing: 0.1em;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
-      user-select: none;
+    header {
+      background-color: #1c3b6b;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    #courses {
+    .container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 30px;
-      width: 100%;
+      gap: 24px;
+      padding: 40px 20px;
       max-width: 1200px;
+      margin: auto;
     }
 
-    .banner {
-      background: #ffffff;
-      color: #1e3c72;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    .course {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: default;
+      transition: transform 0.3s ease;
     }
 
-    .banner:hover {
-      transform: translateY(-12px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    .course:hover {
+      transform: translateY(-5px);
     }
 
-    .banner img {
+    .course img {
       width: 100%;
-      height: 220px;
+      height: 180px;
       object-fit: cover;
-      filter: brightness(0.9);
-      transition: filter 0.3s ease;
     }
 
-    .banner:hover img {
-      filter: brightness(1);
+    .course-content {
+      padding: 20px;
     }
 
-    .banner-content {
-      padding: 24px 28px 32px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+    .course h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      color: #1c3b6b;
     }
 
-    .banner-content h2 {
-      margin: 0 0 20px 0;
-      font-size: 1.9rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: #003366;
+    .course p {
+      margin: 6px 0;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .course p span {
+      font-weight: bold;
+      color: #1c3b6b;
+    }
+
+    footer {
       text-align: center;
-      user-select: none;
-    }
-
-    .info-group {
-      font-size: 1.05rem;
-      line-height: 1.5;
-      margin-bottom: 10px;
-      color: #1e3c72;
-    }
-
-    .info-group strong {
-      display: inline-block;
-      min-width: 110px;
-      font-weight: 700;
-    }
-
-    .register-btn {
-      margin-top: 28px;
-      background: #003366;
-      color: #fff;
-      text-align: center;
-      padding: 14px 0;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 1.2rem;
-      box-shadow: 0 5px 15px rgba(0, 51, 102, 0.6);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-      user-select: none;
-    }
-
-    .register-btn:hover {
-      background: #00509e;
-      box-shadow: 0 7px 18px rgba(0, 80, 158, 0.8);
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 2rem;
-        margin-bottom: 28px;
-      }
+      padding: 20px;
+      color: #777;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
+  <header>הקורסים הקרובים שלנו</header>
 
-  <h1>קורסי עזרה ראשונה קרובים - יוז'וק מדיק</h1>
-  <div id="courses">טוען קורסים...</div>
+  <div class="container" id="coursesContainer"></div>
+
+  <footer>&copy; 2025 יוז׳וק מדיק</footer>
 
   <script>
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbyM2RL13HRo5IauHmhapLLgV4kCPVRmGHg7Ax2ApEstyo-zx4u19XmNl8414pTeBgtIKw/exec";
+    const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzX9DmUZ_Gekr62E9y1vLpoAaNcNbScqr0sD2dtG5X8wtGmj74r7i4kGRNdASwNBDOT/exec';
 
     fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        console.log("נתוני קורסים מהשרת:", data);
-        const container = document.getElementById('courses');
+      .then(response => response.json())
+      .then(courses => {
+        const container = document.getElementById('coursesContainer');
         container.innerHTML = '';
 
-        if (!data || data.length === 0) {
-          container.innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>אין כרגע קורסים זמינים.</p>";
+        if (!courses || courses.length === 0) {
+          container.innerHTML = '<p style="text-align:center;font-size:18px;">אין כרגע קורסים זמינים.</p>';
           return;
         }
 
-        const now = new Date();
-        let displayedCount = 0;
-
-        // מיון לפי תאריך התחלה (עולה)
-        data.sort((a,b) => parseDate(a[1]) - parseDate(b[1]));
-
-        data.forEach(row => {
-          console.log("שורה:", row);
-          console.log("תאריך התחלה גולמי:", row[1]);
-          const startDate = parseDate(row[1]);
-          console.log("תאריך התחלה אחרי המרה:", startDate);
-
-          if (!startDate || startDate < now) {
-            // דילוג על קורסים שהתחילו או עם תאריך לא תקין
-            return;
-          }
-
-          const banner = document.createElement('div');
-          banner.className = 'banner';
-
-          banner.innerHTML = `
-            <img src="${extractDriveImage(row[9])}" alt="תמונת קורס" />
-            <div class="banner-content">
-              <h2>${row[8] || '-'}</h2>
-              <p class="info-group"><strong>תאריך התחלה:</strong> ${formatDate(startDate)}</p>
-              <p class="info-group"><strong>תאריך סיום:</strong> ${formatDate(parseDate(row[2]))}</p>
-              <p class="info-group"><strong>ימי מפגשים:</strong> ${row[3] || '-'}</p>
-              <p class="info-group"><strong>שעות:</strong> ${row[4] || '-'}</p>
-              <p class="info-group"><strong>מחיר:</strong> ${row[5] ? row[5] + ' ש"ח' : '-'}</p>
-              <p class="info-group"><strong>קהל יעד:</strong> ${row[6] || '-'}</p>
-              <p class="info-group"><strong>הערות:</strong> ${row[7] || '-'}</p>
-              <p class="info-group"><strong>מיקום:</strong> ${row[10] || '-'}</p>
-              <a href="#" class="register-btn">להרשמה</a>
+        courses.forEach(course => {
+          const div = document.createElement('div');
+          div.className = 'course';
+          div.innerHTML = `
+            <img src="${course.image || 'https://via.placeholder.com/400x200?text=תמונה+חסרה'}" alt="תמונה">
+            <div class="course-content">
+              <h2>${course.type || 'קורס'}</h2>
+              <p><span>תאריכים:</span> ${course.startDate} - ${course.endDate}</p>
+              <p><span>ימים:</span> ${course.days}</p>
+              <p><span>שעות:</span> ${course.hours}</p>
+              <p><span>מחיר:</span> ${course.price}</p>
+              <p><span>קהל יעד:</span> ${course.target}</p>
+              <p><span>מיקום:</span> ${course.location}</p>
+              <p><span>הערות:</span> ${course.notes}</p>
             </div>
           `;
-
-          container.appendChild(banner);
-          displayedCount++;
+          container.appendChild(div);
         });
-
-        if(displayedCount === 0) {
-          container.innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>אין כרגע קורסים זמינים.</p>";
-        }
       })
-      .catch(err => {
-        console.error(err);
-        document.getElementById('courses').innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>שגיאה בטעינת הקורסים.</p>";
+      .catch(error => {
+        console.error('שגיאה בטעינת הקורסים:', error);
+        document.getElementById('coursesContainer').innerHTML =
+          '<p style="text-align:center;color:red;">אירעה שגיאה בטעינת הקורסים.</p>';
       });
-
-    function extractDriveImage(link) {
-      if (!link) return "https://via.placeholder.com/340x220.png?text=אין+תמונה";
-      const idMatch = link.match(/[-\w]{25,}/);
-      if (idMatch) {
-        return `https://drive.google.com/uc?export=view&id=${idMatch[0]}`;
-      }
-      return "https://via.placeholder.com/340x220.png?text=אין+תמונה";
-    }
-
-    // המרה מתאריך dd/mm/yyyy או מספר סידורי ל-Date אובייקט
-    function parseDate(str) {
-      if (!str) return null;
-
-      // אם זה מספר סידורי של אקסל (Google Sheets)
-      if (!isNaN(str) && str !== '') {
-        return excelDateToJSDate(Number(str));
-      }
-
-      // מנסה תאריך ISO
-      const d = new Date(str);
-      if (!isNaN(d)) return d;
-
-      // מנסה פורמט dd/mm/yyyy
-      const parts = str.split('/');
-      if(parts.length === 3){
-        const day = parseInt(parts[0],10);
-        const month = parseInt(parts[1],10) -1;
-        const year = parseInt(parts[2],10);
-        return new Date(year, month, day);
-      }
-      return null;
-    }
-
-    // המרת מספר סידורי מתאריך אקסל לתאריך JS
-    function excelDateToJSDate(serial) {
-      // לפי נוסחה שמקבלת את התאריך מ-01/01/1970
-      const utc_days = Math.floor(serial - 25569);
-      const utc_value = utc_days * 86400;
-      const date_info = new Date(utc_value * 1000);
-
-      const fractional_day = serial - Math.floor(serial) + 0.0000001;
-      let total_seconds = Math.floor(86400 * fractional_day);
-
-      const seconds = total_seconds % 60;
-      total_seconds -= seconds;
-
-      const hours = Math.floor(total_seconds / 3600);
-      const minutes = Math.floor(total_seconds / 60) % 60;
-
-      return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
-    }
-
-    function formatDate(date) {
-      if(!date) return '-';
-      return date.toLocaleDateString('he-IL', {day: '2-digit', month: '2-digit', year: 'numeric'});
-    }
   </script>
 </body>
 </html>
+

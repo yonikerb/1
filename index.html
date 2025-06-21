@@ -9,38 +9,39 @@
     body {
       margin: 0;
       font-family: 'Assistant', sans-serif;
-      background: linear-gradient(135deg, #003366, #66a3ff);
-      color: #fff;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #f0f4f8;
       direction: rtl;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 10px;
+      padding: 40px 20px;
     }
 
     h1 {
-      font-weight: 700;
+      font-weight: 800;
       font-size: 3rem;
       margin-bottom: 40px;
-      text-shadow: 1px 1px 6px rgba(0,0,0,0.4);
-      letter-spacing: 1.5px;
+      letter-spacing: 0.1em;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+      user-select: none;
     }
 
     #courses {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      gap: 30px;
       width: 100%;
       max-width: 1200px;
     }
 
     .banner {
-      background: #fff;
-      color: #003366;
-      border-radius: 16px;
+      background: #ffffff;
+      color: #1e3c72;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       overflow: hidden;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -48,15 +49,15 @@
     }
 
     .banner:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+      transform: translateY(-12px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
     }
 
     .banner img {
       width: 100%;
-      height: 200px;
+      height: 220px;
       object-fit: cover;
-      filter: brightness(0.85);
+      filter: brightness(0.9);
       transition: filter 0.3s ease;
     }
 
@@ -65,7 +66,7 @@
     }
 
     .banner-content {
-      padding: 20px 24px 30px;
+      padding: 24px 28px 32px;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
@@ -73,52 +74,52 @@
     }
 
     .banner-content h2 {
-      margin: 0 0 16px 0;
-      font-size: 1.8rem;
+      margin: 0 0 20px 0;
+      font-size: 1.9rem;
       font-weight: 700;
       letter-spacing: 0.05em;
-      color: #004080;
+      color: #003366;
       text-align: center;
+      user-select: none;
     }
 
     .info-group {
-      font-size: 1rem;
-      line-height: 1.4;
-      margin-bottom: 8px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin-bottom: 10px;
+      color: #1e3c72;
     }
 
     .info-group strong {
-      color: #0066cc;
       display: inline-block;
-      min-width: 100px;
+      min-width: 110px;
+      font-weight: 700;
     }
 
     .register-btn {
-      margin-top: 20px;
-      background: #0066cc;
+      margin-top: 28px;
+      background: #003366;
       color: #fff;
       text-align: center;
       padding: 14px 0;
-      border-radius: 12px;
+      border-radius: 14px;
       text-decoration: none;
-      font-weight: 700;
-      font-size: 1.1rem;
-      box-shadow: 0 4px 10px rgba(0, 102, 204, 0.5);
+      font-weight: 800;
+      font-size: 1.2rem;
+      box-shadow: 0 5px 15px rgba(0, 51, 102, 0.6);
       transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
     }
 
     .register-btn:hover {
-      background: #004a99;
-      box-shadow: 0 6px 14px rgba(0, 74, 153, 0.7);
+      background: #00509e;
+      box-shadow: 0 7px 18px rgba(0, 80, 158, 0.8);
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 20px 10px;
-      }
       h1 {
         font-size: 2rem;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
       }
     }
   </style>
@@ -138,89 +139,85 @@
         container.innerHTML = '';
 
         if (!data || data.length === 0) {
-          container.innerHTML = "<p style='text-align:center; color:#fff; font-size:1.2rem;'>אין כרגע קורסים זמינים.</p>";
+          container.innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>אין כרגע קורסים זמינים.</p>";
           return;
         }
 
         const now = new Date();
+        let displayedCount = 0;
 
-        // מיון לפי תאריך התחלה עולה
-        data.sort((a, b) => new Date(a[1]) - new Date(b[1]));
-
-        let coursesDisplayed = 0;
+        // מיון לפי תאריך התחלה (עולה)
+        data.sort((a,b) => parseDate(a[1]) - parseDate(b[1]));
 
         data.forEach(row => {
-          const startDateRaw = row[1];
-          const startDate = parseDate(startDateRaw);
+          const startDate = parseDate(row[1]);
           if (!startDate || startDate < now) {
-            // לא מציגים קורסים שהתחילו כבר
+            // דילוג על קורסים שהתחילו או עם תאריך לא תקין
             return;
           }
 
           const banner = document.createElement('div');
           banner.className = 'banner';
 
-          const imgSrc = extractDriveImage(row[9]);
-          const endDate = parseDate(row[2]);
-          const days = row[3] || '-';
-          const hours = row[4] || '-';
-          const price = row[5] ? row[5] + ' ש"ח' : '-';
-          const audience = row[6] || '-';
-          const notes = row[7] || '-';
-          const level = row[8] || '-';
-          const location = row[10] || '-';
-
           banner.innerHTML = `
-            <img src="${imgSrc}" alt="תמונה של הקורס" />
+            <img src="${extractDriveImage(row[9])}" alt="תמונת קורס" />
             <div class="banner-content">
-              <h2>${level}</h2>
+              <h2>${row[8] || '-'}</h2>
               <p class="info-group"><strong>תאריך התחלה:</strong> ${formatDate(startDate)}</p>
-              <p class="info-group"><strong>תאריך סיום:</strong> ${endDate ? formatDate(endDate) : '-'}</p>
-              <p class="info-group"><strong>ימי מפגשים:</strong> ${days}</p>
-              <p class="info-group"><strong>שעות:</strong> ${hours}</p>
-              <p class="info-group"><strong>מחיר:</strong> ${price}</p>
-              <p class="info-group"><strong>קהל יעד:</strong> ${audience}</p>
-              <p class="info-group"><strong>הערות:</strong> ${notes}</p>
-              <p class="info-group"><strong>מיקום:</strong> ${location}</p>
+              <p class="info-group"><strong>תאריך סיום:</strong> ${formatDate(parseDate(row[2]))}</p>
+              <p class="info-group"><strong>ימי מפגשים:</strong> ${row[3] || '-'}</p>
+              <p class="info-group"><strong>שעות:</strong> ${row[4] || '-'}</p>
+              <p class="info-group"><strong>מחיר:</strong> ${row[5] ? row[5] + ' ש"ח' : '-'}</p>
+              <p class="info-group"><strong>קהל יעד:</strong> ${row[6] || '-'}</p>
+              <p class="info-group"><strong>הערות:</strong> ${row[7] || '-'}</p>
+              <p class="info-group"><strong>מיקום:</strong> ${row[10] || '-'}</p>
               <a href="#" class="register-btn">להרשמה</a>
             </div>
           `;
+
           container.appendChild(banner);
-          coursesDisplayed++;
+          displayedCount++;
         });
 
-        if (coursesDisplayed === 0) {
-          container.innerHTML = "<p style='text-align:center; color:#fff; font-size:1.2rem;'>אין כרגע קורסים זמינים.</p>";
+        if(displayedCount === 0) {
+          container.innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>אין כרגע קורסים זמינים.</p>";
         }
       })
       .catch(err => {
         console.error(err);
-        document.getElementById('courses').innerHTML = "<p style='text-align:center; color:#fff; font-size:1.2rem;'>שגיאה בטעינת הקורסים.</p>";
+        document.getElementById('courses').innerHTML = "<p style='text-align:center; color:#f0f4f8; font-size:1.3rem;'>שגיאה בטעינת הקורסים.</p>";
       });
 
     function extractDriveImage(link) {
-      if (!link) return "https://via.placeholder.com/340x200.png?text=אין+תמונה";
+      if (!link) return "https://via.placeholder.com/340x220.png?text=אין+תמונה";
       const idMatch = link.match(/[-\w]{25,}/);
       if (idMatch) {
         return `https://drive.google.com/uc?export=view&id=${idMatch[0]}`;
       }
-      return "https://via.placeholder.com/340x200.png?text=אין+תמונה";
+      return "https://via.placeholder.com/340x220.png?text=אין+תמונה";
     }
 
+    // המרה מתאריך dd/mm/yyyy ל-Date אובייקט
     function parseDate(str) {
       if (!str) return null;
-      // מנסה לפרק תאריך בפורמט dd/mm/yyyy
+      // אם התאריך כבר בפורמט ISO אפשר לנסות ישירות
+      let d = new Date(str);
+      if (!isNaN(d)) return d;
+
       const parts = str.split('/');
-      if (parts.length === 3) {
-        return new Date(parts[2], parts[1] - 1, parts[0]);
+      if(parts.length === 3){
+        // בחלק מהמערכות השנתי בפורמט yyyy-mm-dd אז צריך לשים לב
+        const day = parseInt(parts[0],10);
+        const month = parseInt(parts[1],10) -1;
+        const year = parseInt(parts[2],10);
+        return new Date(year, month, day);
       }
-      // מנסה תאריך ISO
-      const d = new Date(str);
-      return isNaN(d) ? null : d;
+      return null;
     }
 
     function formatDate(date) {
-      return date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      if(!date) return '-';
+      return date.toLocaleDateString('he-IL', {day: '2-digit', month: '2-digit', year: 'numeric'});
     }
   </script>
 </body>

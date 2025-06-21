@@ -135,6 +135,7 @@
     fetch(SHEET_URL)
       .then(res => res.json())
       .then(data => {
+        console.log("נתוני קורסים מהשרת:", data);
         const container = document.getElementById('courses');
         container.innerHTML = '';
 
@@ -150,7 +151,11 @@
         data.sort((a,b) => parseDate(a[1]) - parseDate(b[1]));
 
         data.forEach(row => {
+          console.log("שורה:", row);
+          console.log("תאריך התחלה גולמי:", row[1]);
           const startDate = parseDate(row[1]);
+          console.log("תאריך התחלה אחרי המרה:", startDate);
+
           if (!startDate || startDate < now) {
             // דילוג על קורסים שהתחילו או עם תאריך לא תקין
             return;
@@ -197,22 +202,47 @@
       return "https://via.placeholder.com/340x220.png?text=אין+תמונה";
     }
 
-    // המרה מתאריך dd/mm/yyyy ל-Date אובייקט
+    // המרה מתאריך dd/mm/yyyy או מספר סידורי ל-Date אובייקט
     function parseDate(str) {
       if (!str) return null;
-      // אם התאריך כבר בפורמט ISO אפשר לנסות ישירות
-      let d = new Date(str);
+
+      // אם זה מספר סידורי של אקסל (Google Sheets)
+      if (!isNaN(str) && str !== '') {
+        return excelDateToJSDate(Number(str));
+      }
+
+      // מנסה תאריך ISO
+      const d = new Date(str);
       if (!isNaN(d)) return d;
 
+      // מנסה פורמט dd/mm/yyyy
       const parts = str.split('/');
       if(parts.length === 3){
-        // בחלק מהמערכות השנתי בפורמט yyyy-mm-dd אז צריך לשים לב
         const day = parseInt(parts[0],10);
         const month = parseInt(parts[1],10) -1;
         const year = parseInt(parts[2],10);
         return new Date(year, month, day);
       }
       return null;
+    }
+
+    // המרת מספר סידורי מתאריך אקסל לתאריך JS
+    function excelDateToJSDate(serial) {
+      // לפי נוסחה שמקבלת את התאריך מ-01/01/1970
+      const utc_days = Math.floor(serial - 25569);
+      const utc_value = utc_days * 86400;
+      const date_info = new Date(utc_value * 1000);
+
+      const fractional_day = serial - Math.floor(serial) + 0.0000001;
+      let total_seconds = Math.floor(86400 * fractional_day);
+
+      const seconds = total_seconds % 60;
+      total_seconds -= seconds;
+
+      const hours = Math.floor(total_seconds / 3600);
+      const minutes = Math.floor(total_seconds / 60) % 60;
+
+      return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds);
     }
 
     function formatDate(date) {
